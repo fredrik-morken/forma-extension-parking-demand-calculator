@@ -69,32 +69,37 @@ function RightPanel() {
   >({});
 
   useEffect(() => {
-    Forma.areaMetrics.calculate({}).then((metrics) => {
-      const functionBreakdownMetrics =
-        metrics.builtInMetrics.grossFloorArea.functionBreakdown.filter(
-          (func) => func.functionId != "unspecified",
+    const intervalId = setInterval(() => {
+      Forma.areaMetrics.calculate({}).then((metrics) => {
+        const functionBreakdownMetrics =
+          metrics.builtInMetrics.grossFloorArea.functionBreakdown.filter(
+            (func) => func.functionId != "unspecified",
+          );
+        setGfaPerFunction(functionBreakdownMetrics);
+        const sqmPerSpotPerFunction = Object.fromEntries(
+          functionBreakdownMetrics.map((metric) => [metric.functionId, 50]),
         );
-      setGfaPerFunction(functionBreakdownMetrics);
-      const sqmPerSpotPerFunction = Object.fromEntries(
-        functionBreakdownMetrics.map((metric) => [metric.functionId, 50]),
-      );
 
-      if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
-        setSqmPerSpotPerFunction(sqmPerSpotPerFunction);
-        setLocalStorage(sqmPerSpotPerFunction);
-      } else {
-        setSqmPerSpotPerFunction(getLocalStorage());
-      }
-      //@ts-ignore
-      setNoOfSpots(metrics.parkingStatistics!.spots);
-    });
+        if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
+          setSqmPerSpotPerFunction(sqmPerSpotPerFunction);
+          setLocalStorage(sqmPerSpotPerFunction);
+        } else {
+          setSqmPerSpotPerFunction(getLocalStorage());
+        }
+        //@ts-ignore
+        setNoOfSpots(metrics.parkingStatistics!.spots);
+      });
+    }, 500);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   const demandPerFunction: Record<string, number> = useMemo(() => {
     const demandPerFunction: Record<string, number> = {};
     gfaPerFunction.forEach((metric) => {
       const sqmPerSpot = sqmPerSpotPerFunction[metric.functionId];
-      console.log("sqm per spot input: ", sqmPerSpot);
       if (!sqmPerSpot) {
         demandPerFunction[metric.functionId] = 0;
       } else {
