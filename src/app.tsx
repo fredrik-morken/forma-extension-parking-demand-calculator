@@ -64,8 +64,9 @@ function RightPanel() {
 
   const [noOfSpots, setNoOfSpots] = useState<number>(0);
 
-  const [sqmPerSpotPerFunction, setSqmPerSpotPerFunction] =
-    useState<Record<string, number>>(getLocalStorage());
+  const [sqmPerSpotPerFunction, setSqmPerSpotPerFunction] = useState<
+    Record<string, number>
+  >({});
 
   useEffect(() => {
     Forma.areaMetrics.calculate({}).then((metrics) => {
@@ -81,6 +82,8 @@ function RightPanel() {
       if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
         setSqmPerSpotPerFunction(sqmPerSpotPerFunction);
         setLocalStorage(sqmPerSpotPerFunction);
+      } else {
+        setSqmPerSpotPerFunction(getLocalStorage());
       }
       //@ts-ignore
       setNoOfSpots(metrics.parkingStatistics!.spots);
@@ -125,7 +128,6 @@ function RightPanel() {
   const difference = useMemo(() => {
     return noOfSpots - totalDemand;
   }, [totalDemand, noOfSpots]);
-
   return (
     <div class="wrapper">
       <p class="header">Parking demand</p>
@@ -163,7 +165,7 @@ function RightPanel() {
             <div
               style={{
                 height: "6px",
-                width: `${(noOfSpots / totalDemand) * 100}%`,
+                width: `${Math.min((noOfSpots / totalDemand) * 100, 100)}%`,
                 backgroundColor: "#0696D7",
               }}
             />
