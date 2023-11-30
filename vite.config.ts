@@ -6,5 +6,6 @@ export default defineConfig({
   plugins: [preact()],
   server: {
     port: 8081
-  }
+  },
+  base: '/parking-demand-extension/'
 })
