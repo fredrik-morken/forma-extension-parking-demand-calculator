@@ -139,7 +139,8 @@ function RightPanel() {
   }, [totalDemand, noOfSpots]);
 
   return (
-    <div>
+    <div class="wrapper">
+      <p class="header">Parking demand</p>
       {gfaPerFunction.map((metric) => {
         return (
           <div class="setting-row">
@@ -156,15 +157,19 @@ function RightPanel() {
           </div>
         );
       })}
-      <p>Total GFA on site: {round(totalGfa)}</p>
-      <p>Total parking spot requirement: {round(totalDemand)} </p>
-      <p>Number of parking spots: {noOfSpots}</p>
-      <p>
-        {difference == 0 && "You have the exact right number of spots."}
-        {difference > 0 && `You have a surplus of ${difference} spots.`}
-        {difference < 0 &&
-          `You need ${difference} more spots to satisfy requirements.`}
+      <hr class="divider" />
+      <p class="stats-row">
+        <span>Parking spots</span>{" "}
+        <span>
+          {noOfSpots} / {round(totalDemand)}
+        </span>
       </p>
+      <p className="stats-row">
+        {difference > 0 && <span>Excess parking spots </span>}
+        {difference < 0 && <span>Missing parking spots </span>}
+        {difference != 0 && <span>{Math.abs(difference)}</span>}
+      </p>
+      {/*
       <button
         onClick={() => {
           return Forma.openFloatingPanel({
@@ -175,6 +180,7 @@ function RightPanel() {
       >
         Open settings
       </button>
+      */}
     </div>
   );
 }
