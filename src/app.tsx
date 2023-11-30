@@ -64,18 +64,6 @@ function RightPanel() {
 
   const [noOfSpots, setNoOfSpots] = useState<number>(0);
 
-  const totalGfa = useMemo(
-    () =>
-      gfaPerFunction
-        .filter(
-          (func) =>
-            func.value != "UNABLE_TO_CALCULATE" &&
-            func.functionId != "unspecified",
-        )
-        .reduce((acc, curr) => acc + (curr.value as number), 0),
-    [gfaPerFunction],
-  );
-
   const [sqmPerSpotPerFunction, setSqmPerSpotPerFunction] =
     useState<Record<string, number>>(getLocalStorage());
 
@@ -158,13 +146,34 @@ function RightPanel() {
         );
       })}
       <hr class="divider" />
-      <p class="stats-row">
+      <div
+        class="stats-row"
+        style={{ display: "flex", alignItems: "center", fontSize: "11px" }}
+      >
         <span>Parking spots</span>{" "}
+        <div style={{ width: "65px" }}>
+          <div
+            style={{
+              paddingLeft: "3px",
+              height: "6px",
+              width: "100%",
+              backgroundColor: "#f5f5f5",
+            }}
+          >
+            <div
+              style={{
+                height: "6px",
+                width: `${(noOfSpots / totalDemand) * 100}%`,
+                backgroundColor: "#0696D7",
+              }}
+            />
+          </div>
+        </div>
         <span>
           {noOfSpots} / {round(totalDemand)}
         </span>
-      </p>
-      <p className="stats-row">
+      </div>
+      <p className="stats-row" style={{ fontSize: "11px" }}>
         {difference > 0 && <span>Excess parking spots </span>}
         {difference < 0 && <span>Missing parking spots </span>}
         {difference != 0 && <span>{Math.abs(difference)}</span>}
