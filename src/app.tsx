@@ -165,6 +165,16 @@ function RightPanel() {
             `You need ${difference} more spots to satisfy requirements.`}
         </p>
       </table>
+      <button
+        onClick={() => {
+          return Forma.openFloatingPanel({
+            embeddedViewId: "5e00e471-63ed-44a1-8406-cf2ab73408b9",
+            url: "https://spacemakerai.github.io/parking-demand-extension/?floating=1",
+          });
+        }}
+      >
+        Open settings
+      </button>
     </div>
   );
 }
