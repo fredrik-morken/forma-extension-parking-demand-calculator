@@ -1,0 +1,44 @@
+body {
+    font-family: "Artifakt Element", sans-serif;
+    font-size: 10px;
+    margin: 0;
+    padding: 0 0;
+}
+html {
+    box-sizing: border-box;
+}
+.section {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+}
+
+.setting-row {
+    align-items: center;
+    display: flex;
+}
+
+.setting-row-function-color {
+    border-radius: 8px;
+    height: 8px;
+    margin-right: 12px;
+    width: 8px;
+}
+
+.setting-row-function-name {
+    flex: 1;
+}
+
+.setting-row-function-name::before {
+    content: "";
+    background-color: --color;
+
+}
+
+
+.sqm-input {
+    font-size: 10px;
+    margin: 2px 10px;
+    width: 50px;
+}

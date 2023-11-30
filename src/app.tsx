@@ -33,7 +33,16 @@ function SqmPerSpotPerFunction({
     setSqm(Number(value));
   }
 
-  return <input onInput={onInput} type="number" value={sqm || 0} />;
+  return (
+    /* @ts-ignore */
+    <weave-input
+      class="sqm-input"
+      onInput={onInput}
+      type="number"
+      value={sqm || 0}
+      unit="m²"
+    />
+  );
 }
 
 function Floating() {
@@ -131,40 +140,31 @@ function RightPanel() {
 
   return (
     <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Function name</th>
-            <th>GFA</th>
-            <th>Sqm per spot</th>
-            <th>Required spots</th>
-          </tr>
-        </thead>
-        {gfaPerFunction.map((metric) => {
-          return (
-            <tr>
-              <td>{metric.functionName}</td>
-              <td>{round(metric.value)}</td>
-              <td>
-                <SqmPerSpotPerFunction
-                  setSqm={setSqmPerSpotForFunction(metric.functionId)}
-                  sqm={sqmPerSpotPerFunction[metric.functionId]}
-                />
-              </td>
-              <td>{demandPerFunction[metric.functionId]}</td>
-            </tr>
-          );
-        })}
-        <p>Total GFA on site: {round(totalGfa)}</p>
-        <p>Total parking spot requirement: {round(totalDemand)} </p>
-        <p>Number of parking spots: {noOfSpots}</p>
-        <p>
-          {difference == 0 && "You have the exact right number of spots."}
-          {difference > 0 && `You have a surplus of ${difference} spots.`}
-          {difference < 0 &&
-            `You need ${difference} more spots to satisfy requirements.`}
-        </p>
-      </table>
+      {gfaPerFunction.map((metric) => {
+        return (
+          <div class="setting-row">
+            <div
+              class="setting-row-function-color"
+              style={`background: ${metric.functionColor}`}
+            ></div>
+            <div class="setting-row-function-name">{metric.functionName}</div>
+            <div>1 p. /</div>
+            <SqmPerSpotPerFunction
+              setSqm={setSqmPerSpotForFunction(metric.functionId)}
+              sqm={sqmPerSpotPerFunction[metric.functionId]}
+            />
+          </div>
+        );
+      })}
+      <p>Total GFA on site: {round(totalGfa)}</p>
+      <p>Total parking spot requirement: {round(totalDemand)} </p>
+      <p>Number of parking spots: {noOfSpots}</p>
+      <p>
+        {difference == 0 && "You have the exact right number of spots."}
+        {difference > 0 && `You have a surplus of ${difference} spots.`}
+        {difference < 0 &&
+          `You need ${difference} more spots to satisfy requirements.`}
+      </p>
       <button
         onClick={() => {
           return Forma.openFloatingPanel({
