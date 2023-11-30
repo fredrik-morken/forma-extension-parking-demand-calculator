@@ -36,12 +36,19 @@ function SqmPerSpotPerFunction({
   return <input onInput={onInput} type="number" value={sqm || 0} />;
 }
 
+function Floating() {
+  return <p>The floating panel</p>;
+}
+
 export function App() {
   const floating = new URLSearchParams(window.location.search).get("floating");
   if (floating) {
-    return <>Floating yo</>;
+    return <Floating />;
   }
+  return <RightPanel />;
+}
 
+function RightPanel() {
   const [gfaPerFunction, setGfaPerFunction] = useState<
     FunctionBreakdownMetric[]
   >([]);
