@@ -25,9 +25,9 @@ function SqmPerSpotPerFunction({
 }
 
 export function App() {
-  const floating = new URLSearchParams(window.location.search).get('floating')
+  const floating = new URLSearchParams(window.location.search).get("floating");
   if (floating) {
-    return <>Floating yo</>
+    return <>Floating yo</>;
   }
 
   const [gfaPerFunction, setGfaPerFunction] = useState<
@@ -144,4 +144,3 @@ export function App() {
     </div>
   );
 }
->>>>>>> 975f1e0 (basic working extension)
