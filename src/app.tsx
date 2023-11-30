@@ -1,7 +1,19 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useEffect, useMemo, useState } from "react";
+
+//@ts-ignore
 import { FunctionBreakdownMetric } from "forma-embedded-view-sdk/dist/internal/areaMetrics";
 
+
+const LOCAL_STORAGE_KEY ="parking-demand-extension";
+const getLocalStorage = () :  Record<string, number>=> {
+  const value =  localStorage.getItem(LOCAL_STORAGE_KEY)
+  return value?  JSON.parse(value) : {} as  Record<string, number>
+}
+
+const setLocalStorage = (value:  Record<string, number>) : void=> {
+  return localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value))
+}
 function round(value: number) {
   return Math.round(value);
 }
@@ -36,6 +48,7 @@ export function App() {
 
   const [noOfSpots, setNoOfSpots] = useState<number>(0);
 
+
   const totalGfa = useMemo(
     () =>
       gfaPerFunction
@@ -50,7 +63,7 @@ export function App() {
 
   const [sqmPerSpotPerFunction, setSqmPerSpotPerFunction] = useState<
     Record<string, number>
-  >({});
+  >(getLocalStorage());
 
   useEffect(() => {
     Forma.areaMetrics.calculate({}).then((metrics) => {
@@ -59,11 +72,12 @@ export function App() {
           (func) => func.functionId != "unspecified",
         );
       setGfaPerFunction(functionBreakdownMetrics);
-      setSqmPerSpotPerFunction(
-        Object.fromEntries(
+      const sqmPerSpotPerFunction = Object.fromEntries(
           functionBreakdownMetrics.map((metric) => [metric.functionId, 50]),
-        ),
-      );
+      )
+      setSqmPerSpotPerFunction(sqmPerSpotPerFunction)
+      if(!localStorage.getItem(LOCAL_STORAGE_KEY)) setLocalStorage(sqmPerSpotPerFunction)
+      //@ts-ignore
       setNoOfSpots(metrics.parkingStatistics!.spots);
     });
   }, []);
@@ -89,6 +103,8 @@ export function App() {
   ): (demand: number) => void {
     return function (demand: number) {
       setSqmPerSpotPerFunction((prev) => {
+        const newSqmPerSpot = { ...prev, [functionId]: demand };
+        setLocalStorage(newSqmPerSpot)
         return { ...prev, [functionId]: demand };
       });
     };
