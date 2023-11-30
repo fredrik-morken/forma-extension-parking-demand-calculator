@@ -2,10 +2,17 @@
   "name": "parking-demand-extension",
   "version": "1.0.0",
   "description": "Parking demand calculation plug-in for Autodesk Forma",
-  "main": "index.js",
+  "main": "index.jsx",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@preact/preset-vite": "^2.7.0",
+    "forma-embedded-view-sdk": "^0.35.0",
+    "vite": "^5.0.4"
+  },
+  "type": "module"
 }
