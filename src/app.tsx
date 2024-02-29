@@ -2,7 +2,7 @@ import { FunctionBreakdownMetric } from "forma-embedded-view-sdk/areaMetrics";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useEffect, useMemo, useState } from "react";
 
-export declare const METER_TO_FEET = 3.28084;
+export const METER_TO_FEET = 3.28084;
 
 const LOCAL_STORAGE_KEY = "parking-demand-extension";
 const getLocalStorage = (): Record<string, number> => {
@@ -25,20 +25,26 @@ function SqmPerSpotPerFunction({
   sqm: number;
   setSqm: (demand: number) => void;
 }) {
-  const [imperialUnits, setImperialUnits] = useState<boolean>(false)
+  const [imperialUnits, setImperialUnits] = useState<boolean>(false);
   useEffect(() => {
-    Forma.getPresentationUnitSystem().then(value => setImperialUnits(value === "imperial"))
-  }, [setImperialUnits])
+    Forma.getPresentationUnitSystem().then((value) =>
+      setImperialUnits(value === "imperial")
+    );
+  }, [setImperialUnits]);
   function onInput(event: Event) {
     const { value } = event.target as HTMLInputElement;
     if (isNaN(Number(value))) {
       return;
     }
-    const convertedValue = imperialUnits ? Number(value) / METER_TO_FEET / METER_TO_FEET : Number(value)
+    const convertedValue = imperialUnits
+      ? Number(value) / METER_TO_FEET / METER_TO_FEET
+      : Number(value);
     setSqm(convertedValue);
   }
 
-  const value = imperialUnits ? Math.round(sqm * METER_TO_FEET * METER_TO_FEET) : sqm
+  const value = imperialUnits
+    ? Math.round(sqm * METER_TO_FEET * METER_TO_FEET)
+    : sqm;
 
   return (
     /* @ts-ignore */
@@ -47,7 +53,7 @@ function SqmPerSpotPerFunction({
       onInput={onInput}
       type="number"
       value={value || 0}
-      unit={imperialUnits ? "ft²": "m²"}
+      unit={imperialUnits ? "ft²" : "m²"}
     />
   );
 }
@@ -80,11 +86,11 @@ function RightPanel() {
       Forma.areaMetrics.calculate({}).then((metrics) => {
         const functionBreakdownMetrics =
           metrics.builtInMetrics.grossFloorArea.functionBreakdown.filter(
-            (func) => func.functionId != "unspecified",
+            (func) => func.functionId != "unspecified"
           );
         setGfaPerFunction(functionBreakdownMetrics);
         const sqmPerSpotPerFunction = Object.fromEntries(
-          functionBreakdownMetrics.map((metric) => [metric.functionId, 50]),
+          functionBreakdownMetrics.map((metric) => [metric.functionId, 50])
         );
 
         if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
@@ -108,13 +114,15 @@ function RightPanel() {
     gfaPerFunction.forEach((metric) => {
       const sqmPerSpot = sqmPerSpotPerFunction[metric.functionId];
       if (metric.value === "UNABLE_TO_CALCULATE") {
-        throw new Error(`Metric value for ${metric.functionId} was "UNABLE_TO_CALCULATE"`)
+        throw new Error(
+          `Metric value for ${metric.functionId} was "UNABLE_TO_CALCULATE"`
+        );
       }
       if (!sqmPerSpot) {
         demandPerFunction[metric.functionId] = 0;
       } else {
         demandPerFunction[metric.functionId] = round(
-          metric.value / sqmPerSpotPerFunction[metric.functionId],
+          metric.value / sqmPerSpotPerFunction[metric.functionId]
         );
       }
     });
@@ -122,7 +130,7 @@ function RightPanel() {
   }, [sqmPerSpotPerFunction]);
 
   function setSqmPerSpotForFunction(
-    functionId: string,
+    functionId: string
   ): (demand: number) => void {
     return function (demand: number) {
       setSqmPerSpotPerFunction((prev) => {
@@ -136,7 +144,7 @@ function RightPanel() {
   const totalDemand = useMemo(() => {
     return Object.values(demandPerFunction).reduce(
       (acc, curr) => acc + curr,
-      0,
+      0
     );
   }, [demandPerFunction]);
 
