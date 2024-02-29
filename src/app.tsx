@@ -1,8 +1,8 @@
+import { FunctionBreakdownMetric } from "forma-embedded-view-sdk/areaMetrics";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useEffect, useMemo, useState } from "react";
 
-//@ts-ignore
-import { FunctionBreakdownMetric } from "forma-embedded-view-sdk/dist/internal/areaMetrics";
+export declare const METER_TO_FEET = 3.28084;
 
 const LOCAL_STORAGE_KEY = "parking-demand-extension";
 const getLocalStorage = (): Record<string, number> => {
@@ -25,13 +25,20 @@ function SqmPerSpotPerFunction({
   sqm: number;
   setSqm: (demand: number) => void;
 }) {
+  const [imperialUnits, setImperialUnits] = useState<boolean>(false)
+  useEffect(() => {
+    Forma.getPresentationUnitSystem().then(value => setImperialUnits(value === "imperial"))
+  }, [setImperialUnits])
   function onInput(event: Event) {
     const { value } = event.target as HTMLInputElement;
     if (isNaN(Number(value))) {
       return;
     }
-    setSqm(Number(value));
+    const convertedValue = imperialUnits ? Number(value) / METER_TO_FEET / METER_TO_FEET : Number(value)
+    setSqm(convertedValue);
   }
+
+  const value = imperialUnits ? Math.round(sqm * METER_TO_FEET * METER_TO_FEET) : sqm
 
   return (
     /* @ts-ignore */
@@ -39,8 +46,8 @@ function SqmPerSpotPerFunction({
       class="sqm-input"
       onInput={onInput}
       type="number"
-      value={sqm || 0}
-      unit="m²"
+      value={value || 0}
+      unit={imperialUnits ? "ft²": "m²"}
     />
   );
 }
@@ -100,6 +107,9 @@ function RightPanel() {
     const demandPerFunction: Record<string, number> = {};
     gfaPerFunction.forEach((metric) => {
       const sqmPerSpot = sqmPerSpotPerFunction[metric.functionId];
+      if (metric.value === "UNABLE_TO_CALCULATE") {
+        throw new Error(`Metric value for ${metric.functionId} was "UNABLE_TO_CALCULATE"`)
+      }
       if (!sqmPerSpot) {
         demandPerFunction[metric.functionId] = 0;
       } else {
